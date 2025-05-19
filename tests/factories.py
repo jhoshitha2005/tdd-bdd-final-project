@@ -8,7 +8,7 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -27,8 +27,14 @@ class ProductFactory(factory.Factory):
 
     class Meta:
         """Maps factory to data model"""
-
         model = Product
 
     id = factory.Sequence(lambda n: n)
-   ## Add code to create Fake Products 
+
+    ## Add code to create Fake Products
+    name = factory.Faker("word")
+    description = factory.Faker("sentence")
+    price = FuzzyDecimal(1.00, 100.00)
+    available = FuzzyChoice([True, False])
+    category = FuzzyChoice(list(Category))
+
