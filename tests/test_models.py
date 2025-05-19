@@ -104,3 +104,83 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    def test_read_a_product(self):
+        """It should Read a Product"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Fetch it back
+        found_product = Product.find(product.id)
+        self.assertEqual(found_product.id, product.id)
+        self.assertEqual(found_product.name, product.name)
+        self.assertEqual(found_product.description, product.description)
+        self.assertEqual(found_product.price, product.price)
+        self.assertEqual(found_product.available, product.available)
+        self.assertEqual(found_product.category, product.category)
+
+    def test_update_a_product(self):
+        """It should Update a Product"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Update the product
+        product.name = "UpdatedName"
+        product.description = "Updated Description"
+        product.price = 99.99
+        product.available = not product.available
+        product.category = Category.FOOD  # assuming Category.FOOD exists
+        product.update()
+        # Fetch it back
+        updated_product = Product.find(product.id)
+        self.assertEqual(updated_product.name, "UpdatedName")
+        self.assertEqual(updated_product.description, "Updated Description")
+        self.assertEqual(updated_product.price, 99.99)
+        self.assertEqual(updated_product.available, product.available)
+        self.assertEqual(updated_product.category, Category.FOOD)
+
+    def test_delete_a_product(self):
+        """It should Delete a Product"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        product_id = product.id
+        self.assertIsNotNone(product_id)
+        # Delete it
+        product.delete()
+        # Try to fetch it back
+        deleted_product = Product.find(product_id)
+        self.assertIsNone(deleted_product)
+
+    def test_list_all_products(self):
+        """It should List All Products"""
+        ProductFactory.create_batch(5)
+        products = Product.all()
+        self.assertEqual(len(products), 5)
+
+    def test_search_product_by_name(self):
+        """It should Search Products by Name"""
+        product = ProductFactory(name="UniqueProductName")
+        product.id = None
+        product.create()
+        found = Product.find_by_name("UniqueProductName")
+        self.assertTrue(any(p.id == product.id for p in found))
+
+    def test_search_product_by_category(self):
+        """It should Search Products by Category"""
+        product = ProductFactory(category=Category.CLOTHS)
+        product.id = None
+        product.create()
+        found = Product.find_by_category(Category.CLOTHS)
+        self.assertTrue(any(p.id == product.id for p in found))
+
+    def test_search_product_by_availability(self):
+        """It should Search Products by Availability"""
+        product = ProductFactory(available=True)
+        product.id = None
+        product.create()
+        found = Product.find_by_availability(True)
+        self.assertTrue(any(p.id == product.id for p in found))
+
