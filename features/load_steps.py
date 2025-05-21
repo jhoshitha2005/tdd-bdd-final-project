@@ -1,17 +1,21 @@
 # features/steps/load_steps.py
+
 from behave import given
-from service.models import Product, db
+import requests
+from http import HTTPStatus
 
 @given('the following products exist')
 def step_impl(context):
-    """Load background product data from the feature file into the database"""
+    """Send product data from feature file to REST API via POST requests"""
+    rest_endpoint = "http://localhost:5000/api/products"  # Change as per your API
+
     for row in context.table:
-        product = Product(
-            name=row['name'],
-            description=row['description'],
-            price=float(row['price']),
-            available=(row['available'].lower() == 'true'),
-            category=row['category']
-        )
-        db.session.add(product)
-    db.session.commit()
+        payload = {
+            "name": row['name'],
+            "description": row['description'],
+            "price": row['price'],
+            "available": row['available'] in ['True', 'true', '1'],
+            "category": row['category']
+        }
+        context.resp = requests.post(rest_endpoint, json=payload)
+        assert context.resp.status_code == HTTPStatus.CREATED
