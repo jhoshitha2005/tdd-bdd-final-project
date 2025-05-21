@@ -3,7 +3,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# You may obtain a copy of the License at:
 #
 # https://www.apache.org/licenses/LICENSE-2.0
 #
@@ -37,7 +37,6 @@ ID_PREFIX = 'product_'
 def step_impl(context):
     """ Make a call to the base URL """
     context.driver.get(context.base_url)
-    # Uncomment next line to take a screenshot of the web page
     # context.driver.save_screenshot('home_page.png')
 
 
@@ -141,3 +140,38 @@ def step_impl(context, element_name, text_string):
     )
     element.clear()
     element.send_keys(text_string)
+
+
+##################################################################
+# Search Result Verification Steps
+##################################################################
+@then('I should see "{name}" in the results')
+def step_impl(context, name):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'search_results'),
+            name
+        )
+    )
+    assert found
+
+
+@then('I should not see "{name}" in the results')
+def step_impl(context, name):
+    element = context.driver.find_element(By.ID, 'search_results')
+    assert name not in element.text
+
+
+##################################################################
+# Flash Message Step
+##################################################################
+@then('I should see the message "{message}"')
+def step_impl(context, message):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            message
+        )
+    )
+    assert found
+
